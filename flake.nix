@@ -1,30 +1,30 @@
 {
-  description = "A code sandbox";
+  description = "A dev sandbox";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
-    let system = "x86_64-linux";
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
         pkgs = import nixpkgs { inherit system; };
         ghc = pkgs.ghc.withPackages (hs: with hs; [
           bytestring
           cryptonite
           random
         ]);
-
-    in {
-
-      devShell.${system} = pkgs.mkShell {
-        buildInputs = [
-          ghc
-          pkgs.nodejs-16_x
-          (pkgs.python3.withPackages (ps: [
-            ps.ipython
-          ]))
-        ];
-      };
-
-    };
+        python = pkgs.python3.withPackages (ps: with ps; [
+          ipython
+        ]);
+      in {
+        devShell = pkgs.mkShell {
+          buildInputs = [
+            ghc
+            pkgs.nodejs
+            python
+          ];
+        };
+      });
 }
