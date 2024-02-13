@@ -18,6 +18,8 @@
     in {
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [
+          pkgs.bear
+          pkgs.ccls
           ghc
           pkgs.nodejs
           python
